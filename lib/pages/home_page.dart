@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
+import 'package:provider/provider.dart';
 import 'package:work_with_network/offices.dart';
+import 'package:work_with_network/theme/theme.dart';
 
-import 'theme_settings.dart';
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _HomePageState extends State<HomePage> {
   late Future<OfficesList> officesList;
   @override
   void initState() {
@@ -25,7 +24,18 @@ class _MyHomePageState extends State<MyHomePage> {
         title: const Text('JSON Serialization'),
         centerTitle: true,
         actions: [
-          SwitchTheme(),
+          IconButton(
+            icon: const Icon(
+              Icons.brightness_6,
+              size: 30,
+            ),
+            color: Theme.of(context).brightness == Brightness.light
+                ? Colors.grey
+                : Colors.green,
+            onPressed: () {
+              Provider.of<ThemeProvider>(context, listen: false).swapTheme();
+            },
+          )
         ],
       ),
       body: FutureBuilder<OfficesList>(
@@ -62,18 +72,15 @@ class SwitchTheme extends StatefulWidget {
 }
 
 class _SwitchThemeState extends State<SwitchTheme> {
-  bool isDarkMode = false;
+  bool switchValue = false;
 
   @override
   Widget build(BuildContext context) {
     return Switch(
-      value: isDarkMode,
-      onChanged: (value) {
-        final themeSettingsBox = Hive.box<ThemeSettings>('themeSettings');
-        final themeSettings = ThemeSettings(isDarkMode: value);
-        themeSettingsBox.put('settings', themeSettings);
+      value: switchValue,
+      onChanged: (newValue) {
         setState(() {
-          isDarkMode = value;
+          switchValue = newValue;
         });
       },
     );
